@@ -20,6 +20,8 @@ void read(int n)
         scanf("%s", str1);
         n1 = count(str1);
         n2 = count(str2);
+
+        
         if (n2 < n1)
         {
             int i = 0;
