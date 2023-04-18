@@ -1,5 +1,5 @@
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int count(char str[100])
 {
@@ -12,48 +12,47 @@ int count(char str[100])
     return n;
 }
 
-void check(FILE *fptr,char str[100])
+void check(FILE *fptr, char pat[100])
 {
     char lin[100];
-    int i=0,j=0,p1=0,status=1;
-    while(!feof(fptr))
+    int i = 0, j = 0, p1 = 0, status = 1;
+    while (!feof(fptr))
     {
-        fgets(lin,50,fptr);
-        printf("%s",lin);
-        int n1=count(lin);       
-        int n2=count(str);
-        for(i=0;i<n1-n2;i++)
+        fgets(lin, 50, fptr);
+        printf("%s", lin);
+        int n1 = count(lin);
+        int n2 = count(pat);
+        for (i = 0; i < n1 - n2; i++)
         {
-            for(j=0;j<n2;j++)
+            for (j = 0; j < n2; j++)
             {
-                if(str[j]!=lin[i+j])
+                if (pat[j] != lin[i + j])
                 {
-                    status=0;
+                    status = 0;
                     break;
                 }
             }
-            if(j==n2&&status==1)
+            if (j == n2 + 1 && status == 1)
             {
-               p1=1;
-               break;
+                p1 = 1;
+                break;
             }
-            status=1;
+            status = 1;
         }
-        status=1;
-       if(p1==1)
-       {
-            printf("%s\n",lin);
-            break;   
-       }
-       p1=0;  
+        if (p1 == 1)
+        {
+            printf("%s\n", lin);
+            break;
+        }
+        p1 = 0;
     }
 }
 int main()
 {
     FILE *fptr;
-    char pat[100];   
-    fptr=fopen("text.txt","r");
-    fgets(pat,100,fptr);
-    check(fptr,pat);
+    char pat[100];
+    fptr = fopen("text.txt", "r");
+    fgets(pat, 100, fptr);
+    check(fptr, pat);
     fclose(fptr);
 }
