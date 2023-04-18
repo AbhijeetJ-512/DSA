@@ -17,7 +17,7 @@ void read(int n)
     char str1[100], str2[100] = {0};
     for (i = 0; i < n; i++)
     {
-        scanf("%s", str1);
+        gets(str1);
         n1 = count(str1);
         n2 = count(str2);
 
@@ -39,6 +39,6 @@ int main()
     char str[100];
     int n;
     printf("Enter no of lines\n");
-    scanf("%d", &n);
+    scanf("%d ", &n);
     read(n);
 }
