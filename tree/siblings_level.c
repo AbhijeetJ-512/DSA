@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+#define COUNT 10
 struct tree
 {
     int key;
@@ -62,6 +62,37 @@ void random(FILE *fp, int n)
     }
     rewind(fp);
 }
+
+void print2DUtil(struct tree *root, int space)
+{
+    // Base case
+    if (root == NULL)
+        return;
+
+    // Increase distance between levels
+    space += COUNT;
+
+    // Process right child first
+    print2DUtil(root->right, space);
+
+    // Print current node after space
+    // count
+    printf("\n");
+    for (int i = COUNT; i < space; i++)
+        printf(" ");
+    printf("%d\n", root->key);
+
+    // Process left child
+    print2DUtil(root->left, space);
+}
+
+// Wrapper over print2DUtil()
+void print2D(struct tree *root)
+{
+    // Pass initial space count as 0
+    print2DUtil(root, 0);
+}
+
 // Driver Code
 int main()
 {
@@ -96,5 +127,6 @@ int main()
             printf("Siblings in level %d is %d\n", i, a[i]);
         }
     }
+    print2D(root);
     return 0;
 }
