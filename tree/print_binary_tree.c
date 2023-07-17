@@ -1,7 +1,7 @@
 // C program to insert a node in AVL tree
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#define COUNT 10
 
 // An AVL tree node
 struct tree
@@ -159,56 +159,96 @@ struct tree *minValueNode(struct tree *node)
 
 struct tree *deleteNode(struct tree *root, int key)
 {
-    // base case
-    if (root == NULL)
-        return root;
+    // STEP 1: PERFORM STANDARD BST DELETE
 
-    // If the key to be deleted
-    // is smaller than the root's
-    // key, then it lies in left subtree
+    if (root == NULL)
+    {
+        printf("not found\n");
+        return root;
+    }
+
+    // If the key to be deleted is smaller than the
+    // root's key, then it lies in left subtree
     if (key < root->key)
         root->left = deleteNode(root->left, key);
 
-    // If the key to be deleted
-    // is greater than the root's
-    // key, then it lies in right subtree
+    // If the key to be deleted is greater than the
+    // root's key, then it lies in right subtree
     else if (key > root->key)
         root->right = deleteNode(root->right, key);
 
-    // if key is same as root's key,
-    // then This is the node
-    // to be deleted
+    // if key is same as root's key, then This is
+    // the node to be deleted
     else
     {
         // node with only one child or no child
-        if (root->left == NULL)
+        if ((root->left == NULL) || (root->right == NULL))
         {
-            struct tree *temp = root->right;
-            free(root);
-            return temp;
+            struct tree *temp = root->left ? root->left : root->right;
+
+            // No child case
+            if (temp == NULL)
+            {
+                temp = root;
+                root = NULL;
+            }
+            else               // One child case
+                *root = *temp; // Copy the contents of
+                               // the non-empty child
+            free(temp);
         }
-        else if (root->right == NULL)
+        else
         {
-            struct tree *temp = root->left;
-            free(root);
-            return temp;
+            // node with two children: Get the inorder
+            // successor (smallest in the right subtree)
+            struct tree *temp = minValueNode(root->right);
+
+            // Copy the inorder successor's data to this node
+            root->key = temp->key;
+
+            // Delete the inorder successor
+            root->right = deleteNode(root->right, temp->key);
         }
-
-        // node with two children:
-        // Get the inorder successor
-        // (smallest in the right subtree)
-        struct tree *temp = minValueNode(root->right);
-
-        // Copy the inorder
-        // successor's content to this node
-        root->key = temp->key;
-
-        // Delete the inorder successor
-        root->right = deleteNode(root->right, temp->key);
     }
+
+    // If the tree had only one node then return
+    if (root == NULL)
+        return root;
+
+    // STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
+    root->height = 1 + max(height(root->left),
+                           height(root->right));
+
+    // STEP 3: GET THE BALANCE FACTOR OF THIS NODE (to
+    // check whether this node became unbalanced)
+    int balance = getBalance(root);
+
+    // If this node becomes unbalanced, then there are 4 cases
+
+    // Left Left Case
+    if (balance > 1 && getBalance(root->left) >= 0)
+        return rightRotate(root);
+
+    // Left Right Case
+    if (balance > 1 && getBalance(root->left) < 0)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
+    // Right Right Case
+    if (balance < -1 && getBalance(root->right) <= 0)
+        return leftRotate(root);
+
+    // Right Left Case
+    if (balance < -1 && getBalance(root->right) > 0)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
     return root;
 }
-
 // A utility function to print preorder traversal
 // of the tree.
 // The function also prints height of every node
@@ -221,61 +261,81 @@ void preOrder(struct tree *root)
         preOrder(root->right);
     }
 }
-int check_height(struct tree *root)
+
+void random(FILE *fp, int n)
 {
-    if (height(root->left) == height(root->right))
+    int r;
+    srand(time(NULL));
+    for (int i = 0; i < n; i++)
     {
-        return 1;
+        r = rand() % 100;
+        fprintf(fp, "%d ", r);
     }
-    return 0;
+    rewind(fp);
 }
-void check_tree(struct tree *root, int count)
+void print2DUtil(struct tree *root, int space)
 {
-    int i = 0;
-    while (1)
-    {
-        if (count == (pow(2, i) - 1))
-        {
-            printf("perfect binary tree\n");
-            break;
-        }
-        else if (count < (pow(2, i) - 1))
-        {
-            printf("complete binary tree\n");
-            break;
-        }
-        i++;
-    }
+    // Base case
+    if (root == NULL)
+        return;
+
+    // Increase distance between levels
+    space += COUNT;
+
+    // Process right child first
+    print2DUtil(root->right, space);
+
+    // Print current node after space
+    // count
+    printf("\n");
+    for (int i = COUNT; i < space; i++)
+        printf(" ");
+    printf("%d\n", root->key);
+
+    // Process left child
+    print2DUtil(root->left, space);
+}
+
+// Wrapper over print2DUtil()
+void print2D(struct tree *root)
+{
+    // Pass initial space count as 0
+    print2DUtil(root, 0);
 }
 
 /* Driver program to test above function*/
 int main()
 {
     struct tree *root = NULL;
-    int n, hee, count = 0;
-    /* Constructing tree given in the above figure */
-    while (1)
+    int n;
+    FILE *fp = fopen("random.txt", "w+");
+    printf("Enter how many random numbers:\n");
+    scanf("%d", &n);
+    random(fp, n);
+    for (int i = 0; i < n + 1; i++)
     {
-        printf("Enter element\n");
-        scanf("%d", &n);
-        root = insert(root, n);
-        count++;
-        hee = check_height(root);
-        if (hee == 1) // complete or degenrte tree
-        {
-            check_tree(root, count);
-        }
-        else
-        {
-            printf("Degreate tree\n");
-        }
+        int key;
+        fscanf(fp, "%d", &key);
+        root = insert(root, key);
     }
-
+    fclose(fp);
     /* The constructed AVL Tree would be
-            30
+                30
             / \
             20 40
             / \	 \
-            10 25 50
+        10 25 50
     */
+
+    printf("Preorder traversal of the constructed AVL tree is \n");
+    preOrder(root);
+    while (1)
+    {
+        printf("\nEnter what u what to delete:\n");
+        scanf("%d", &n);
+        root = deleteNode(root, n);
+        preOrder(root);
+        print2D(root);
+    }
+    return 0;
 }

@@ -1,23 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct node
+struct tree
 {
     int key;
-    struct node *left, *right;
+    struct tree *left, *right;
 };
 
 // A utility function to create a new BST node
-struct node *newNode(int item)
+struct tree *newNode(int item)
 {
-    struct node *temp = (struct node *)malloc(sizeof(struct node));
+    struct tree *temp = (struct tree *)malloc(sizeof(struct tree));
     temp->key = item;
     temp->left = temp->right = NULL;
     return temp;
 }
 
 // A utility function to do inorder traversal of BST
-void inorder(struct node *root)
+void inorder(struct tree *root)
 {
     if (root != NULL)
     {
@@ -26,7 +26,7 @@ void inorder(struct node *root)
         inorder(root->right);
     }
 }
-void preorder(struct node *root)
+void preorder(struct tree *root)
 {
     if (root != NULL)
     {
@@ -35,7 +35,7 @@ void preorder(struct node *root)
         preorder(root->right);
     }
 }
-void postorder(struct node *root)
+void postorder(struct tree *root)
 {
     if (root != NULL)
     {
@@ -47,7 +47,7 @@ void postorder(struct node *root)
 
 // A utility function to insert
 // a new node with given key in BST
-struct node *insert(struct node *node, char key)
+struct tree *insert(struct tree *node, char key)
 {
     // If the tree is empty, return a new node
     if (node == NULL)
@@ -76,7 +76,7 @@ void random(FILE *fp, int n)
 int main()
 {
     int n;
-    struct node *root = NULL;
+    struct tree *root = NULL;
     FILE *fp = fopen("random.txt", "w+");
     printf("Enter how many random numbers:\n");
     scanf("%d", &n);
